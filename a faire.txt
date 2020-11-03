@@ -4,9 +4,11 @@
 "users" : id, email, password, username, phone
 "products" : product_id, name, description, city, price, user_id, category_id
 "categories" : categories_id, name
-]
 
-4 / Créer nos tables products et categories
+4 / Créer nos tables [products et categories]
 -------------------------------------
-
-4 / Faire un système d'authentification
+5 / Faire un système d'authentification
+6 / Créer une page d'affichage des produits 
+7 / Créer une page de profile contenant l'affichage dynamique des produits 
+8 / Créer un formulaire de modification du numéro de téléphone de l'utilisateur
+9 / Ajouter la fonctionnalité de suppression des produits. 
