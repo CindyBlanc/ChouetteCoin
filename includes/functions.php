@@ -141,7 +141,7 @@ function ajoutProduits($name, $description, $price, $city, $category, $user_id)
             // Affichage conditionnel du message de réussite
             if ($sth->execute()) {
                 echo "<div class='alert alert-success'> Votre article a été ajouté à la base de données </div>";
-                header('Location: products.php');
+                header('Location: product.php?id='.$conn->lastInsertID());
             }
         } catch (PDOException $e) {
             echo 'Error: '.$e->getMessage();
