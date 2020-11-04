@@ -51,9 +51,10 @@ if (!empty($_POST['email_signup']) && !empty($_POST['password1_signup']) && !emp
             </div>
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="Check1" required>
-                <label class="form-check-label" for="Check1">Accepter les <a href="#">termes et conditions</a></label>
+                <label class="form-check-label" for="Check1">Accepter les <a href="#" class="text-success">termes
+                        et conditions</a></label>
             </div>
-            <button type="submit" class="btn btn-primary" name="submit_signup">S'inscrire</button>
+            <button type="submit" class="btn btn-warning" name="submit_signup">S'inscrire</button>
         </form>
     </div>
 
@@ -71,7 +72,7 @@ if (!empty($_POST['email_signup']) && !empty($_POST['password1_signup']) && !emp
                 <input type="password" class="form-control " id="InputPassword" name="password_login" required>
             </div>
 
-            <button type="submit" class="btn btn-primary" name="submit_login" value="connexion">Connexion</button>
+            <button type="submit" class="btn btn-warning" name="submit_login" value="connexion">Connexion</button>
         </form>
     </div>
 </div>

@@ -7,7 +7,7 @@
 
 4 / Créer nos tables [products et categories]
 -------------------------------------
-5 / Faire un système d'authentification
+5 / Faire un système d'authentification [done]
 6 / Créer une page d'affichage des produits 
 7 / Créer une page de profile contenant l'affichage dynamique des produits 
 8 / Créer un formulaire de modification du numéro de téléphone de l'utilisateur
