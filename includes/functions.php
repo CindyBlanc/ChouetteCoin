@@ -148,3 +148,84 @@ function ajoutProduits($name, $description, $price, $city, $category, $user_id)
         }
     }
 }
+
+function affichageProduitsByUser($user_id)
+{
+    global $conn;
+    $sth = $conn->prepare("SELECT p.*,c.categories_name FROM products AS p LEFT JOIN categories AS c ON p.category_id = c.categories_id WHERE p.user_id = {$user_id}");
+    $sth->execute();
+
+    $products = $sth->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($products as $product) {
+        ?>
+<tr>
+    <th scope="row"><?php echo $product['products_id']; ?>
+    </th>
+    <td><?php echo $product['products_name']; ?>
+    </td>
+    <td><?php echo $product['description']; ?>
+    </td>
+    <td><?php echo $product['price']; ?>
+    </td>
+    <td><?php echo $product['city']; ?>
+    </td>
+    <td><?php echo $product['categories_name']; ?>
+    </td>
+
+    <td> <a href="product.php?id=<?php echo $product['products_id']; ?>"
+            class="btn btn-outline-success">Afficher
+            article</a>
+    </td>
+    <td><a href="editproducts.php?id=<?php echo $product['products_id']; ?>"
+            class="btn btn-outline-warning">Editer</a></td>
+    <td>
+        <form action="process.php" method="post">
+            <input type="hidden" name="product_id"
+                value="<?php echo $product['products_id']; ?>" />
+            <input type="submit" name="product_delete" class="btn btn-outline-danger" value="Supprimer" />
+        </form>
+    </td>
+
+</tr>
+<?php
+    }
+}
+
+function modifProduits($name, $description, $price, $city, $category, $id, $user_id)
+{
+    global $conn;
+    if (is_int($price) && $price > 0 && $price < 1000000) {
+        try {
+            $sth = $conn->prepare('UPDATE products SET products_name=:products_name, description=:description, price=:price, city=:city, category_id=:category_id WHERE products_id=:products_id AND user_id=:user_id');
+            $sth->bindValue(':products_name', $name);
+            $sth->bindValue(':description', $description);
+            $sth->bindValue(':price', $price);
+            $sth->bindValue(':city', $city);
+            $sth->bindValue(':category_id', $category);
+            $sth->bindValue(':products_id', $id);
+            $sth->bindValue(':user_id', $user_id);
+            if ($sth->execute()) {
+                echo "<div class='alert alert-success'> Votre modification a bien été prise en compte </div>";
+                header("Location: product.php?id={$id}");
+            }
+        } catch (PDOException $e) {
+            echo 'Error: '.$e->getMessage();
+        }
+    }
+}
+
+function modifNumero()
+{
+    global $conn;
+
+    try {
+        $sth = $conn->prepare('UPDATE user SET phone=:phone WHERE user_id=:user_id');
+        $sth->bindValue(':phone', $phone);
+        if ($sth->execute()) {
+            echo "<div class='alert alert-success'> Votre modification a bien été prise en compte </div>";
+            header('Location: profile.php');
+        }
+    } catch (PDOException $e) {
+        echo 'Error: '.$e->getMessage();
+    }
+}

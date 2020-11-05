@@ -25,6 +25,16 @@
     -> Lancement d'une cession (avec $_SESSION).
 10. **AJOUTER LA VARIABLE $conn EN GLOBAL A CHAQUE FONCTION PLUTOT QUE COMME ARGUMENT**
 11. Création d'une fonction d'affichage des données depuis la BDD
-    -> Faire une requête SELEC à la base de données avec les pramètres de notre choix (en l'occurance aucune pour l'instant)
-    -> Faire un array qui contien le fetchAll sur les données récupérées.
-    -> Crées une boucle foreach qui passe chaque ligne des données récupérées depuis la base de données dans un tableau html
+    -> Faire une requête SELEC à la base de données avec les pramètres de notre choix (une requete globlr et une requete par id produit)
+    -> Faire un array qui contien le fetchAll sur les données récupérées(ou un fetch s'il n'y a qu'une seule ligne récupérée).
+    -> Crées une boucle foreach qui passe chaque ligne des données récupérées depuis la base de données dans un tableau html (Ou tout simpelment dans des balises HTML)
+12. Créatoin d'une page process.php qui contiendrai la logique de tous les formulaires
+    -> Bloquer l'accès de cette page aux méthodes autres que POST
+    -> Ajout d'une condition pour le formulaire d'ajout de produits
+    -> bloquer l'accès de cette page aux méthodes
+13. Création d'une fonction d'ajout de produits dans la BDD
+    -> Création d'un formulaire contenant toutes les informations nécessaire à l'ajout de produits dans la base de données (Le champ category_id est récupéré dynamiquement depuis la base de données, par un fetchAll de la table catégories)
+    -> Les champs id et user_id se remplissent différement. L'id est en auto-increment mais le user_id est récupéré depuis le token de $_session
+    -> Vérification de la variable $price qui doit être un entier strictement positif et inférieur à 1 million
+    -> Créer une requete sql en PDO pour l'ajout de données dans la base de données, avec des marqueurs nommés et des bindValues
+    -> Aprés validation du formulaire, création d'une redirection vers le produit fraichement créé à l'aide du lastInsertId() sur le lien de redirection
