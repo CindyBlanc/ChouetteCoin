@@ -38,31 +38,15 @@
             modifProduits($name, $description, $price, $city, $category, $id, $user_id);
         }
     } elseif (isset($_POST['product_delete'])) {
-        // echo "<div class='alert alert-danger'> Vous tentez de supprimer l'article n°".$_POST['product_id'].'</div>';
+        $product = $_POST['product_id'];
+        $user_id = $_SESSION['id'];
 
-        try {
-            $sth = $conn->prepare('DELETE FROM products WHERE products_id = :products_id AND user_id = :user_id');
-            $sth->bindValue(':products_id', $_POST['product_id']);
-            $sth->bindValue(':user_id', $_SESSION['id']);
-            $sth->execute();
-
-            echo "<div class='alert alert-danger'> Vous avez supprimé l'article n°".$_POST['product_id'].'</div>';
-        } catch (PDOException $e) {
-            echo 'Error: '.$e->getMessage();
-        }
+        suppProduits($user_id, $product);
     } elseif (isset($_POST['user_edit'])) {
         $user_id = $_POST['user_id'];
         $phone = $_POST['user_phone'];
-        try {
-            $sth = $conn->prepare('UPDATE users SET phone=:phone WHERE id=:user_id');
-            $sth = bindValue(':phone', $phone');
-            $sth = bindValue(':user_id', $user_id');
-            if ($sth->execute()) {
-                echo "<div class='alert alert-success'> Votre modification a bien été prise en compte </div>";
-            }
-        } catch (PDOException $e) {
-            echo 'Error: '.$e->getMessage();
-        }
+
+        modifPhone($user_id, $numDePhone);
     }
 
     require 'includes/footer.php';

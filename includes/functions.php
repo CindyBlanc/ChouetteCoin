@@ -1,5 +1,18 @@
-<?php
+  <?php
 require 'includes/config.php';
+
+function shorten_text($text, $max = 60, $append = '&hellip;')
+{
+    if (strlen($text) <= $max) {
+        return $text;
+    }
+    $return = substr($text, 0, $max);
+    if (false === strpos($text, ' ')) {
+        return $return.$append;
+    }
+
+    return preg_replace('/\w+$/', '', $return).$append;
+}
 
 function inscription($email, $username, $password1, $password2)
 {
@@ -78,29 +91,70 @@ function affichageProduits()
     $products = $sth->fetchAll(PDO::FETCH_ASSOC);
     foreach ($products as $product) {
         ?>
-<tr>
-    <th scope="row"><?php echo $product['products_id']; ?>
-    </th>
-    <td><?php echo $product['products_name']; ?>
-    </td>
-    <td><?php echo $product['description']; ?>
-    </td>
-    <td><?php echo $product['price']; ?>
-    </td>
-    <td><?php echo $product['city']; ?>
-    </td>
-    <td><?php echo $product['categories_name']; ?>
-    </td>
-    <td><?php echo $product['username']; ?>
-    </td>
-    <td> <a
-            href="product.php?id=<?php echo $product['products_id']; ?>">Afficher
-            article</a>
-    </td>
-</tr>
-<?php
+  <div class="card mx-2" style="width: 18rem;">
+      <div class="card-body">
+          <h5 class="card-title"><?php echo $product['products_name']; ?>
+          </h5>
+          <h6 class="card-subtitle mb-2 text-muted"><?php echo $product['city']; ?>
+          </h6>
+          <p class="card-text"><?php echo $product['description']; ?>
+          </p>
+          <ul class="list-group list-group-flush">
+              <li class="list-group-item"><?php echo $product['price']; ?>
+                  €</li>
+              <li class="list-group-item"><?php echo $product['city']; ?>
+              </li>
+              <li class="list-group-item"><?php echo $product['categories_name']; ?>
+              </li>
+          </ul>
+          <a href="product.php?id=<?php echo $product['products_id']; ?>"
+              class="card-link btn btn-primary">Afficher article</a>
+      </div>
+  </div>
+  <?php
     }
 }
+
+function affichageProduitsByUser($user_id)
+{
+    global $conn;
+    $sth = $conn->prepare("SELECT p.*,c.categories_name FROM products AS p LEFT JOIN categories AS c ON p.category_id = c.categories_id WHERE p.user_id = {$user_id}");
+    $sth->execute();
+
+    $products = $sth->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($products as $product) {
+        ?>
+  <tr>
+      <th scope="row"><?php echo $product['products_id']; ?>
+      </th>
+      <td><?php echo $product['products_name']; ?>
+      </td>
+      <td><?php echo shorten_text($product['description']); ?>
+      </td>
+      <td><?php echo $product['price']; ?> €
+      </td>
+      <td><?php echo $product['city']; ?>
+      </td>
+      <td><?php echo $product['categories_name']; ?>
+      </td>
+      <td> <a href="product.php?id=<?php echo $product['products_id']; ?>"
+              class="fa btn btn-outline-primary"><i class="fas fa-eye"></i></a>
+      </td>
+      <td> <a href="editproducts.php?id=<?php echo $product['products_id']; ?>"
+              class="fa btn btn-outline-warning"><i class="fas fa-pen"></i></a>
+      </td>
+      <td>
+          <form action="process.php" method="post">
+              <input type="hidden" name="product_id"
+                  value="<?php echo $product['products_id']; ?>">
+              <input type="submit" name="product_delete" class="fa btn btn-outline-danger" value="&#xf2ed;"></input>
+          </form>
+      </td>
+  </tr>
+  <?php
+    }
+}
+
 function affichageProduit($id)
 {
     global $conn;
@@ -108,18 +162,19 @@ function affichageProduit($id)
     $sth->execute();
 
     $product = $sth->fetch(PDO::FETCH_ASSOC); ?>
-<div class="row">
-    <div class="col-12">
-        <h1><?php echo $product['products_name']; ?>
-        </h1>
-        <p><?php echo $product['description']; ?>
-        </p>
-        <p><?php echo $product['city']; ?>
-        </p>
-        <button class="btn btn-danger"><?php echo $product['price']; ?> </button>
-    </div>
-</div>
-<?php
+  <div class="row">
+      <div class="col-12">
+          <h1><?php echo $product['products_name']; ?>
+          </h1>
+          <p><?php echo $product['description']; ?>
+          </p>
+          <p><?php echo $product['city']; ?>
+          </p>
+          <button class="btn btn-danger"><?php echo $product['price']; ?> €
+          </button>
+      </div>
+  </div>
+  <?php
 }
 
 function ajoutProduits($name, $description, $price, $city, $category, $user_id)
@@ -141,53 +196,11 @@ function ajoutProduits($name, $description, $price, $city, $category, $user_id)
             // Affichage conditionnel du message de réussite
             if ($sth->execute()) {
                 echo "<div class='alert alert-success'> Votre article a été ajouté à la base de données </div>";
-                header('Location: product.php?id='.$conn->lastInsertID());
+                header('Location: product.php?id='.$conn->lastInsertId());
             }
         } catch (PDOException $e) {
             echo 'Error: '.$e->getMessage();
         }
-    }
-}
-
-function affichageProduitsByUser($user_id)
-{
-    global $conn;
-    $sth = $conn->prepare("SELECT p.*,c.categories_name FROM products AS p LEFT JOIN categories AS c ON p.category_id = c.categories_id WHERE p.user_id = {$user_id}");
-    $sth->execute();
-
-    $products = $sth->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($products as $product) {
-        ?>
-<tr>
-    <th scope="row"><?php echo $product['products_id']; ?>
-    </th>
-    <td><?php echo $product['products_name']; ?>
-    </td>
-    <td><?php echo $product['description']; ?>
-    </td>
-    <td><?php echo $product['price']; ?>
-    </td>
-    <td><?php echo $product['city']; ?>
-    </td>
-    <td><?php echo $product['categories_name']; ?>
-    </td>
-
-    <td> <a href="product.php?id=<?php echo $product['products_id']; ?>"
-            class="btn btn-outline-success">Afficher
-            article</a>
-    </td>
-    <td><a href="editproducts.php?id=<?php echo $product['products_id']; ?>"
-            class="btn btn-outline-warning">Editer</a></td>
-    <td>
-        <form action="process.php" method="post">
-            <input type="hidden" name="product_id"
-                value="<?php echo $product['products_id']; ?>" />
-            <input type="submit" name="product_delete" class="btn btn-outline-danger" value="Supprimer" />
-        </form>
-    </td>
-
-</tr>
-<?php
     }
 }
 
@@ -196,7 +209,7 @@ function modifProduits($name, $description, $price, $city, $category, $id, $user
     global $conn;
     if (is_int($price) && $price > 0 && $price < 1000000) {
         try {
-            $sth = $conn->prepare('UPDATE products SET products_name=:products_name, description=:description, price=:price, city=:city, category_id=:category_id WHERE products_id=:products_id AND user_id=:user_id');
+            $sth = $conn->prepare('UPDATE products SET products_name=:products_name, description=:description, price=:price,city=:city, category_id=:category_id WHERE products_id=:products_id AND user_id=:user_id');
             $sth->bindValue(':products_name', $name);
             $sth->bindValue(':description', $description);
             $sth->bindValue(':price', $price);
@@ -214,16 +227,35 @@ function modifProduits($name, $description, $price, $city, $category, $id, $user
     }
 }
 
-function modifNumero()
+function modifPhone($user_id, $numDePhone)
 {
     global $conn;
 
     try {
-        $sth = $conn->prepare('UPDATE user SET phone=:phone WHERE user_id=:user_id');
-        $sth->bindValue(':phone', $phone);
+        $sth = $conn->prepare('UPDATE users SET phone=:phone WHERE id=:user_id');
+        $sth->bindValue(':phone', $numDePhone);
+        $sth->bindValue(':user_id', $user_id);
         if ($sth->execute()) {
-            echo "<div class='alert alert-success'> Votre modification a bien été prise en compte </div>";
-            header('Location: profile.php');
+            header('Location:profile.php?p');
+        }
+    } catch (PDOException $e) {
+        echo 'Error: '.$e->getMessage();
+    }
+}
+
+// Fonction de suppression des produits. Les arguments renseignés sont des placeholders étant donné qu'ils seront remplacés par les véritables variables une fois la fonction appelée;
+function suppProduits($user_id, $produit_id)
+{
+    // Récupération de la connexion à la BDD à partir de l'espace global.
+    global $conn;
+
+    // Tentative de la requête de suppression.
+    try {
+        $sth = $conn->prepare('DELETE FROM products WHERE products_id = :products_id AND user_id =:user_id');
+        $sth->bindValue(':products_id', $produit_id);
+        $sth->bindValue(':user_id', $user_id);
+        if ($sth->execute()) {
+            header('Location:profile.php?s');
         }
     } catch (PDOException $e) {
         echo 'Error: '.$e->getMessage();
